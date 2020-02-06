@@ -11,7 +11,7 @@
  * primarily through commenting, though will refactor if necessary.
  */
 
-#include <I2C.h>
+#include "I2C.h"
 
 uint16_t busErrorCount = 0;
 uint16_t i2cGetBusErrorCount()

@@ -17,10 +17,8 @@
 #include <stdint.h>
 #include <msp430.h>
 #include <stdint.h>
-#include <bsp.c>
-
-
-typedef uint8_t hDev;
+#include "base\bsp.c"
+#include "comm_utils.h"
 
 /*Should this instead be a different count? What does it affect?*/
 // Keeping it sane with a 1-based count
@@ -28,6 +26,12 @@ typedef enum _bus_instance_i2c {
     I2CBus1 = 1,
     I2CBus2 = 2,
 } bus_instance_i2c;
+
+// CONFIGM... configuration values are defined as MACROS
+// Use these for values that will be needed in other initializers (best example:  buffer sizes)
+// KEEP at 3. Only 3 built in pull-up resistors. without removing these 4+ instances will render voltage too low to measure
+#define CONFIGM_i2c_maxperipheralinstances   3
+#define CONFIGM_i2c_maxdevices               8
 
 typedef enum {
     i2cRes_noerror = 0,
@@ -65,7 +69,7 @@ typedef struct {
 
 typedef struct {
     bus_instance_i2c bus;
-    uint16_t slaveaddr;
+    uint16_t slaveaddr ;
 } device_context_i2c;
 
 //in ms
@@ -93,21 +97,6 @@ FILE_STATIC void inline i2cLoadTransmitBuffer(bus_instance_i2c bus, uint8_t inpu
 FILE_STATIC uint8_t inline i2cRetrieveReceiveBuffer(bus_instance_i2c bus)  {  return I2CREG(bus, UCBxRXBUF);  }
 FILE_STATIC void inline i2cAutoStopSetTotalBytes(bus_instance_i2c bus, uint8_t count)  { I2CREG(bus, UCBxTBCNT) = count; }  // NOTE: must be called under reset!
 
-// CONFIGM... configuration values are defined as MACROS
-// Use these for values that will be needed in other initializers (best example:  buffer sizes)
-// KEEP at 3. Only 3 built in pull-up resistors. without removing these 4+ instances will render voltage too low to measure
-#define CONFIGM_i2c_maxperipheralinstances   3
-#define CONFIGM_i2c_maxdevices               8
-
-// Synchronous (busy-waiting) version of I2C calls
-/*Is this still something we need to do?*/
-// TODO:  Add NACK and other edge-case support to busy/waits
-#ifndef DISABLE_SYNC_I2C_CALLS
-
-/*Is this still something that we need to do?*/
-// TODO:  Re-enable this warning once there is actually an option to do async :)
-//#warning Synchronous calls to I2C are inefficient - consider disabling sync calls and \
-//using the async interrupt-based API instead, with DISABLE_SYNC_I2C_CALLS.
 //FILE_STATIC void inline i2cWaitForStopComplete(bus_instance_i2c bus)  { while (I2CREG(bus, UCBxCTLW0) & UCTXSTP); }
 FILE_STATIC void inline i2cWaitForStopComplete(bus_instance_i2c bus)  { uint16_t timeout = READ_WRITE_TIMEOUT; while (timeout-- && I2CREG(bus, UCBxCTLW0) & UCTXSTP) __delay_cycles(READ_WRITE_INCREMENT); }
 //FILE_STATIC void inline i2cWaitForStartComplete(bus_instance_i2c bus) { while (I2CREG(bus, UCBxCTLW0) & UCTXSTT); }
@@ -145,9 +134,6 @@ uint16_t i2cGetBytesWritten();
 void i2cReset();
 
 #endif /* DISABLE_SYNC_I2C_CALLS */
-
-/*Is this something we still need to do?*/
-// TODO:  Add "async" interrupt-based alternative to synchronous versions
 
 // Initializes I2C
 hDev i2cInit(bus_instance_i2c instance, uint8_t slaveaddr);
