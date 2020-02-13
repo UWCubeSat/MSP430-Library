@@ -13,6 +13,7 @@
 
 #include "I2C.h"
 
+// defines each field and its "get" method individually
 uint16_t busErrorCount = 0;
 uint16_t i2cGetBusErrorCount()
 {

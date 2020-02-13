@@ -12,16 +12,12 @@
  * primarily through commenting, though will refactor if necessary.
  */
 
-/*How do we get uints to become defined if stdint.h does not define it?*/
-
 #include <stdint.h>
 #include <msp430.h>
 #include <stdint.h>
 #include "base\bsp.c"
 #include "comm_utils.h"
 
-/*Should this instead be a different count? What does it affect?*/
-// Keeping it sane with a 1-based count
 typedef enum _bus_instance_i2c {
     I2CBus1 = 1,
     I2CBus2 = 2,
@@ -80,7 +76,7 @@ typedef struct {
 #define I2C_MASTER_RECEIVE_INTERRUPT_MASK     (UCRXEIE | UCNACKIE )
 #define I2C_MASTER_TRANSMIT_INTERRUPT_MASK    (UCTXIE2 | UCNACKIE )
 
-/*How do we avoid unpleasant hacks to create clean dual-bus support*/
+/* How do we avoid the unpleasantness? Do we need dual-bus support? */
 // Some quasi-unpleasant hacks to make for clean dual-bus support in general
 #define I2CREG(n,x)       (*(busregs[(uint8_t)n].x))
 
@@ -124,25 +120,29 @@ FILE_STATIC void inline i2cAutoStopSetTotalBytes(bus_instance_i2c bus, uint8_t c
 //FILE_STATIC void inline i2cWaitForStopComplete(bus_instance_i2c bus)  { while (I2CREG(bus, UCBxCTLW0) & UCTXSTP); }
 FILE_STATIC void inline i2cWaitForStopComplete(bus_instance_i2c bus)  {
     uint16_t timeout = READ_WRITE_TIMEOUT;
-    while (timeout-- && I2CREG(bus, UCBxCTLW0) & UCTXSTP) __delay_cycles(READ_WRITE_INCREMENT);
+    while (timeout-- && I2CREG(bus, UCBxCTLW0) & UCTXSTP)
+        __delay_cycles(READ_WRITE_INCREMENT);
 }
 
 //FILE_STATIC void inline i2cWaitForStartComplete(bus_instance_i2c bus) { while (I2CREG(bus, UCBxCTLW0) & UCTXSTT); }
 FILE_STATIC void inline i2cWaitForStartComplete(bus_instance_i2c bus) {
     uint16_t timeout = READ_WRITE_TIMEOUT;
-    while (timeout-- && I2CREG(bus, UCBxCTLW0) & UCTXSTT) __delay_cycles(READ_WRITE_INCREMENT);
+    while (timeout-- && I2CREG(bus, UCBxCTLW0) & UCTXSTT)
+        __delay_cycles(READ_WRITE_INCREMENT);
 }
 
 //FILE_STATIC void inline i2cWaitReadyToTransmitByte(bus_instance_i2c bus)  { while ( (I2CREG(bus, UCBxIFG) & UCTXIFG0) == 0); }
 FILE_STATIC void inline i2cWaitReadyToTransmitByte(bus_instance_i2c bus)  {
     uint16_t timeout = READ_WRITE_TIMEOUT;
-    while (timeout-- && (I2CREG(bus, UCBxIFG) & UCTXIFG0) == 0) __delay_cycles(READ_WRITE_INCREMENT);
+    while (timeout-- && (I2CREG(bus, UCBxIFG) & UCTXIFG0) == 0)
+        __delay_cycles(READ_WRITE_INCREMENT);
 }
 
 //FILE_STATIC void inline i2cWaitReadyToReceiveByte(bus_instance_i2c bus)  { while ( (I2CREG(bus, UCBxIFG) & UCRXIFG) == 0); }
 FILE_STATIC void inline i2cWaitReadyToReceiveByte(bus_instance_i2c bus)  {
     uint16_t timeout = READ_WRITE_TIMEOUT;
-    while (timeout-- && (I2CREG(bus, UCBxIFG) & UCRXIFG) == 0) __delay_cycles(READ_WRITE_INCREMENT);
+    while (timeout-- && (I2CREG(bus, UCBxIFG) & UCRXIFG) == 0)
+        __delay_cycles(READ_WRITE_INCREMENT);
 }
 
 /***************************/
