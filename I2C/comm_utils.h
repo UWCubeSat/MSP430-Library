@@ -5,8 +5,8 @@
  *      Author: Logan Ince
  */
 
-#ifndef CORE_UTILS_H_
-#define CORE_UTILS_H_
+#ifndef COMM_UTILS_H_
+#define COMM_UTILS_H_
 #include <stdint.h>
 
 // Generic handle for buses and devices

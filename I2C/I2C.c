@@ -98,6 +98,7 @@ hdev i2c_init(bus_instance_i2c bus, uint8_t slave_addr) {
     return 0;
 }
 
+/* How can we avoid the unpleasantness? Is this even necessary? */
 // Some quasi-unpleasant hackery to make for clean dual-bus support in general
 static void populateBusRegisters(bus_instance_i2c instance)
 {
@@ -285,6 +286,7 @@ i2c_result i2cMasterRegisterRead(hDev device, uint8_t registeraddr, uint8_t * bu
     return i2cMasterCombinedWriteRead(device, &registeraddr, 1, buff, szToRead);
 }
 
+/*  I understand nothing about these vector functions */
 // Primary interrupt vector for I2C on module B1 (I2C #1)
 #pragma vector = EUSCI_B1_VECTOR
 __interrupt void USCI_B1_ISR(void)
