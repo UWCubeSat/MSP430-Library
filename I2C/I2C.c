@@ -12,7 +12,7 @@
  */
 
 #include "I2C.h"
-
+/* 5 errors appear that seem to be complaining that a file called connection.xml does not exist */
 // defines each field and its "get" method individually
 uint16_t busErrorCount = 0;
 uint16_t i2cGetBusErrorCount()
