@@ -22,7 +22,6 @@
 
 uint8_t spiWriteInProgress;
 
-void (*spiCallback)(void);
 /**
  * @brief Initialize SPI registers required to start transceiving.
  * @details Sets up the control block to reset the device.
@@ -33,20 +32,5 @@ void (*spiCallback)(void);
  * 			
  */
 void spiInit(uint8_t csPins);
-
-/**
- * @brief reads/writes to/from SPI bus using buffers
- * @details This method writes *num* bytes from a buffer *pTxBuf* to the
-           SPI bus using 3 Wire SPI Mode. It will store the bytes received
-           during the write sequence to another client provided buffer,
-           *pRxBuf*. The pRxBuf must be at least *num* bytes, and it will
-           fill *num* bytes of data.
- * 
- * @param pTxBuf A pointer to the transmit buffer.
- * @param pRxBuf A pointer to the receive buffer.
- * @param num Size of the transmit buffer in bytes.
- */
-void spiTransceive(uint8_t *pTxBuf, uint8_t *pRxBuf, size_t num, uint8_t csPin);
-
 
 #endif	/* SPI_H */

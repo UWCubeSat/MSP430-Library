@@ -20,3 +20,6 @@ void bspI2CInit() {
    // configured port settings
    PM5CTL0 &= ~LOCKLPM5;
 }
+
+void bspSPIInit() {
+}

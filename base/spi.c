@@ -3,32 +3,15 @@
 #include <stdint.h>
 #include "spi.h"
 
-void dummyFn(void){}
-
 void spiInit(uint8_t csPins)
 {
-
-	spiCallback = dummyFn;
-	/******************************************** UCB0CTLW0 ************************************************ 
-	/  [15]   UCCKPH:  0b = Data is changed on the first UCLK edge and captured on the following edge.
-	/  [14]   UCCKPL:  0b = The inactive state is low.
-	/  [13]   UCMSB:   MSB first select. Controls the direction of the receive and transmit shift register.
-	/ 		   		   1b = MSB first.
-	/  [12]   UC7BIT:  Character length. Selects 7-bit or 8-bit character length. 0b = 8-bit data.
-	/  [11]   UCMST:   Master mode select. 1b = Master mode.
-	/  [10-9] UCMODEx: eUSCI mode. The UCMODEx bits select the synchronous mode when UCSYNC = 1.
-	/ 				   00b = 3-pin SPI
-	/  [8] 	  UCSYNC:  Synchronous mode enable. 1b = Synchronous mode. 
-	/  [7-6]  UCSSELx: 10b = SMCLK in master mode. Don't use in slave mode.
-	/  [1]    UCSTEM:  STE mode select in master mode. This byte is ignored in slave or 3-wire mode.
-	/  [0]    UCSWRST: Software reset enable. 0b = Disabled. eUSCI reset released for operation.
-	********************************************************************************************************/
-
-	/* 1. Set UCSWRST. */
+   /* 1. Set UCSWRST. */
 	UCA2CTLW0 = UCSWRST;
 	UCA2CTLW0 |= UCSSEL_2;
 	UCA2CTLW0 |= UCMODE_THREE_WIRE_SPI | UCMSB | UCSYNC | UCMST | UCCKPH;
 	//UCCKPH shifts bits to rising edge of clock.
+   
+   /* 2. Initialize all eUSCI registers with UCSWRST = 1 (including UCxCTL1). */
 
 	/* 3. Configure ports. 
 	P5SEL0.0 = 1: UCB1SIMO
@@ -51,89 +34,6 @@ void spiInit(uint8_t csPins)
 	/* 5. Clear UCSWRST to start device. */
 	UCA2CTLW0 &= ~UCSWRST;
 
-	/* 6. Set Pin 1 Direction to OUT */
-    if(csPins & CS_1){
-        P2DIR |= BIT4;
-    }
-    if(csPins & CS_2){
-        P4DIR |= BIT4;
-    }
-    if(csPins & CS_3){
-        P4DIR |= BIT5;
-    }
-
-	// Set CS high
-    if(csPins & CS_1){
-        P2OUT |= BIT4;
-    }
-    if(csPins & CS_2){
-        P4OUT |= BIT4;
-    }
-    if(csPins & CS_3){
-        P4OUT |= BIT5;
-    }
+	/* 6. Enable interrupts with UCRXIE or UCTXIE. */
 }
-void spiTransceive(uint8_t *pTxBuf, uint8_t *pRxBuf, size_t num, uint8_t csPin){
-	// Clear the MSP430's rxBuffer of any junk data left over from previous transactions.
-	//*pRxBuf = UCB1RXBUF;
-
-	uint8_t dummydata = UCB1RXBUF;
-
-	// TX all data from the provided register over the SPI bus by adding it to the txbuffer one byte at a time.
-	// Store all data received from the slave in pRxBuf.
-	uint8_t i;
-	for(i = 0; i < num; i++) {
-
-		// Wait for any previous tx to finish.
-	    // The timeout is used just in case an interrupt put us
-	    // in an illegal state. Shouldn't happen, as we've been mitigating
-	    // it, but we've kept it here is a last resort.
-        uint16_t timeout = UINT16_MAX;
-		while (!(UCA2IFG & UCTXIFG) && timeout){
-			timeout--;
-		}
-
-		// Drop CS Pin if it hasn't been dropped yet.
-		if (i == 0){
-            if(csPin & CS_1){
-                P2OUT &= ~BIT4;
-            }
-            else if(csPin & CS_2){
-                P4OUT &= ~BIT4;
-            }
-            else if(csPin & CS_3){
-                P4OUT &= ~BIT5;
-            }
-		}
-		// Write to tx buffer.
-		UCA2TXBUF = *pTxBuf;
-
-		// Bring CS High again.
-		if (i == num - 1){
-            if(csPin & CS_1){
-                P2OUT |= BIT4;
-            }
-            else if(csPin & CS_2){
-                P4OUT |= BIT4;
-            }
-            else if(csPin & CS_3){
-                P4OUT |= BIT5;
-            }
-		}
-
-		// Wait for any previous rx to finish rx-ing.
-        // The timeout is used just in case an interrupt put us
-        // in an illegal state. Shouldn't happen, as we've been mitigating
-        // it, but we've kept it here is a last resort.
-        timeout = UINT16_MAX;
-		while (!(UCA2IFG & UCRXIFG) && timeout){
-			timeout--;
-		}
-		// Store data transmitted from the slave.
-		*pRxBuf = UCA2RXBUF;
-
-		// Increment the pointer to send and store the next byte.
-		pTxBuf++;
-		pRxBuf++;
-	}
 }
