@@ -240,7 +240,7 @@ static i2c_result i2cCoreWrite(hDev device, uint8_t * buff, uint8_t szToWrite, B
     return i2cRes_noerror;
 }
 
-2c_result i2cMasterRead(hDev device, uint8_t * buff, uint8_t szToRead)
+i2c_result i2cMasterRead(hDev device, uint8_t * buff, uint8_t szToRead)
 {
     return i2cCoreRead(device, buff, szToRead, TRUE);
 }
