@@ -60,8 +60,6 @@ void spiInit(uint8_t csPins)
 	   // Clear the MSP430's rxBuffer of any junk data left over from previous transactions.
 	   //*pRxBuf = UCB1RXBUF;
 
-	   uint8_t dummydata = UCB1RXBUF;
-
 	   // TX all data from the provided register over the SPI bus by adding it to the txbuffer one byte at a time.
 	   // Store all data received from the slave in pRxBuf.
 	   uint8_t i;

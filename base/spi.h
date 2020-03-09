@@ -2,7 +2,9 @@
 #ifndef SPI_H
 #define SPI_H
 
+#include <stdio.h>
 #include <msp430.h>
+#include <stdint.h>
 
 // Configuration macros for UCB0CTLW0.
 #define UCMODE_THREE_WIRE_SPI 				   0x0000
