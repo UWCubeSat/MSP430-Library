@@ -1,0 +1,20 @@
+/*
+ * MissionLoop.c
+ *
+ *  Created on: Feb 27, 2020
+ *      Author: Logan Ince
+ */
+ 
+ int main() {
+ 	// Wait until altitude >= 60,000 ft
+ 	// PPT begins fire at 60000 ft stops firing at 90000 feet or when altitude begins to decrease
+ 	while(/*altitude>=60,000 ft*/) {
+ 		if(/*altitude >= 90,000 ft || delta_altitude < 0*/) {
+ 		    //ppt_stop
+ 			break();
+ 		}
+ 		//ppt_fire
+ 		//langmuir_read
+ 	}
+}
+ 
